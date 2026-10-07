@@ -3,12 +3,18 @@ const cp = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { test } = require("node:test");
+const { test, after } = require("node:test");
 const { Parser, Language, Query } = require("web-tree-sitter");
 
 const root = path.resolve(__dirname, "..");
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "swift-parser-test-"));
 const wasm = path.join(temporary, "swift.wasm");
+after(() => {
+  const directory = path.resolve(temporary);
+  assert.ok(directory.startsWith(path.resolve(os.tmpdir()) + path.sep));
+  assert.ok(path.basename(directory).startsWith("swift-parser-test-"));
+  fs.rmSync(directory, { recursive: true, force: true });
+});
 const cli = path.join(
   path.dirname(require.resolve("tree-sitter-cli/package.json")),
   process.platform === "win32" ? "tree-sitter.exe" : "tree-sitter"
@@ -31,7 +37,19 @@ run(cli, ["build", "--wasm", "-o", wasm]);
 test("builds a portable Wasm parser without process or stdio imports", async () => {
   const bytes = fs.readFileSync(wasm);
   const imports = WebAssembly.Module.imports(new WebAssembly.Module(bytes));
-  for (const name of ["abort", "exit", "stderr", "fwrite", "fprintf"]) {
+  assert.equal(
+    imports.some((item) => item.module === "wasi_snapshot_preview1"),
+    false
+  );
+  for (const name of [
+    "abort",
+    "exit",
+    "stderr",
+    "fwrite",
+    "fprintf",
+    "proc_exit",
+    "fd_write",
+  ]) {
     assert.equal(
       imports.some((item) => item.name === name),
       false,
@@ -135,7 +153,10 @@ test("fails fast when scanner allocation fails in native and Wasm builds", () =>
         `call "${setup}" >nul && cl /nologo /std:c11 /Isrc ${mode === "wasm" ? "/D__wasm__ " : ""}"${source}" /Fe:"${executable}" /Fo:"${object}"`,
       ]);
     }
-    const result = cp.spawnSync(executable, [], { windowsHide: true });
+    const result = cp.spawnSync(executable, [], {
+      windowsHide: true,
+      timeout: 5000,
+    });
     assert.equal(result.error, undefined);
     assert.equal(
       result.status,
