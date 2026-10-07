@@ -1,3 +1,4 @@
+// Sample outline input; query regression assertions live in test/wasm.test.cjs.
 import Foundation
 
 protocol SomeProtocol {

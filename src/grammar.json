@@ -1114,7 +1114,7 @@
     },
     "_escaped_identifier": {
       "type": "PATTERN",
-      "value": "\\\\[0\\\\tnr\"'\\n]"
+      "value": "\\\\(?:[0\\\\tnr\"']|\\r?\\n)"
     },
     "multi_line_str_text": {
       "type": "PATTERN",
@@ -1159,11 +1159,11 @@
         },
         {
           "type": "PATTERN",
-          "value": "\\/\\n"
+          "value": "\\/\\r?\\n"
         },
         {
           "type": "PATTERN",
-          "value": "(\\/[^#]|[^/])*?\\n[ \\t]*\\/#"
+          "value": "(\\/[^#]|[^/])*?\\r?\\n[ \\t]*\\/#"
         }
       ]
     },

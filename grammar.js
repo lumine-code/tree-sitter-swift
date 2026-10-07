@@ -393,7 +393,7 @@ module.exports = grammar({
         ),
         ","
       ),
-    _escaped_identifier: ($) => /\\[0\\tnr"'\n]/,
+    _escaped_identifier: ($) => /\\(?:[0\\tnr"']|\r?\n)/,
     multi_line_str_text: ($) => /[^\\"]+/,
     // Based on https://gitlab.com/woolsweater/tree-sitter-swifter/-/blob/3d47c85bd47ce54cdf2023a9c0e01eb90adfcc1d/grammar.js#L1019
     // But required modifications to hit all of the cases in SE-354
@@ -409,7 +409,7 @@ module.exports = grammar({
 
     _multiline_regex_literal: ($) =>
       // The closing `/#` may be indented, as it is in practice.
-      seq($._hash_symbol, /\/\n/, /(\/[^#]|[^/])*?\n[ \t]*\/#/),
+      seq($._hash_symbol, /\/\r?\n/, /(\/[^#]|[^/])*?\r?\n[ \t]*\/#/),
 
     _oneline_regex_literal: ($) =>
       token(

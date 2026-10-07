@@ -5,9 +5,7 @@
       "camelcase": "Swift",
       "scope": "source.swift",
       "path": ".",
-      "file-types": [
-        "swift"
-      ],
+      "file-types": ["swift"],
       "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm",
       "locals": "queries/locals.scm",
@@ -15,17 +13,16 @@
     }
   ],
   "metadata": {
-    "version": "0.7.4",
+    "version": "1.0.0",
     "license": "MIT",
-    "description": "A tree-sitter grammar for the Swift programming language.",
+    "description": "Parses Swift source code with Tree-sitter.",
     "authors": [
       {
-        "name": "Alex Pinkus",
-        "email": "alex.pinkus@gmail.com"
+        "name": "lumine-code"
       }
     ],
     "links": {
-      "repository": "git+https://github.com/alex-pinkus/tree-sitter-swift.git"
+      "repository": "https://github.com/lumine-code/tree-sitter-swift"
     }
   },
   "bindings": {
