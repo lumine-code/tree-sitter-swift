@@ -7,7 +7,7 @@ This fork maintains the parser used by the editor. Its grammar and corpus origin
 ## Features
 
 - **Parsing**: Swift declarations, expressions, concurrency and Swift 6 syntax.
-- **Portable output**: builds native parsers and WebAssembly without process or stdio imports.
+- **Portable output**: builds native parsers and portable WebAssembly.
 - **Allocation failure**: stops safely before accessing a missing scanner state.
 
 ## Building

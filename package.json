@@ -8,7 +8,7 @@
   "scripts": {
     "install": "tree-sitter generate && node-gyp-build",
     "test": "tree-sitter test && node --test test/wasm.test.cjs",
-    "lint": "eslint test/wasm.test.cjs eslint.config.cjs && prettier --check package.json tree-sitter.json README.md eslint.config.cjs prettier.config.cjs .github/workflows/ci.yml .github/workflows/publish.yml test/wasm.test.cjs",
+    "lint": "eslint test/wasm.test.cjs eslint.config.cjs && prettier --check package.json tree-sitter.json README.md eslint.config.cjs .prettierrc.json .github/workflows/ci.yml .github/workflows/publish.yml test/wasm.test.cjs",
     "build": "tree-sitter generate",
     "prepare": "tree-sitter generate"
   },
