@@ -2,6 +2,8 @@
 
 Parses Swift source code with Tree-sitter.
 
+Fork of [alex-pinkus/tree-sitter-swift](https://github.com/alex-pinkus/tree-sitter-swift).
+
 This fork maintains the parser used by the editor. Its grammar and corpus originate from alex-pinkus/tree-sitter-swift; the original copyright and license notices remain in the source.
 
 ## Features
