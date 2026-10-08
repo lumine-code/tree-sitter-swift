@@ -31,6 +31,18 @@ jobs:
       - run: node install.js
         working-directory: node_modules/tree-sitter-cli
       - run: npm run build
+      - name: Update the Rust toolchain
+        run: rustup toolchain install stable --profile minimal --no-self-update
+      - name: Test the Rust binding
+        run: cargo +stable test
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+          cache: true
+      - name: Test the Go binding
+        env:
+          CGO_ENABLED: "1"
+        run: go test ./bindings/go
       - run: npm run lint
       - run: npm test
       - run: npm run install
