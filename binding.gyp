@@ -36,7 +36,7 @@
 		  "src/parser.c",
 		  "src/tree_sitter",
 	      ],
-	      "action": ["tree-sitter", "generate"],
+	      "action": ["node", "scripts/generate-parser.js"],
 	  }
       ]
     }

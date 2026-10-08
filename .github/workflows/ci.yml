@@ -33,4 +33,9 @@ jobs:
       - run: npm run build
       - run: npm run lint
       - run: npm test
+      - run: npm run install
+      - run: npm ci --ignore-scripts
+        working-directory: test-npm-package
+      - run: npm test
+        working-directory: test-npm-package
       - run: npm pack --dry-run

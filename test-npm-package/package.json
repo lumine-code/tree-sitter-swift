@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm install && node index.js"
+    "test": "node index.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "tree-sitter": "^0.22.1",
-    "tree-sitter-swift": "file:../"
+    "tree-sitter": "^0.25.1",
+    "@lumine-code/tree-sitter-swift": "file:../"
   }
 }
