@@ -11,6 +11,7 @@ license = "MIT"
 build = "bindings/rust/build.rs"
 include = [
   "LICENSE",
+  "THIRD_PARTY_NOTICES",
   "bindings/rust/*",
   "grammar.ts",
   "queries/*",

@@ -55,6 +55,7 @@ setup(
         "bdist_wheel": BdistWheel
     },
     license="MIT",
+    license_files=["LICENSE", "THIRD_PARTY_NOTICES"],
     python_requires=">=3.8",
     zip_safe=False
 )
