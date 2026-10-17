@@ -43,7 +43,8 @@
     "src/**",
     "*.wasm",
     "test/wasm.test.cjs",
-    "test/scanner-allocation.c"
+    "test/scanner-allocation.c",
+    "THIRD_PARTY_NOTICES"
   ],
   "license": "MIT",
   "bugs": "https://github.com/lumine-code/tree-sitter-swift/issues",
