@@ -928,6 +928,9 @@ static enum TokenType find_possible_compiler_directive(TSLexer *lexer) {
             if (expected_char == '\0') {
                 full_match = dir_idx;
                 lexer->mark_end(lexer);
+                // Do not compare or advance beyond a matched terminator at EOF.
+                possible_directives[dir_idx] = false;
+                continue;
             }
 
             if (expected_char != lexer->lookahead) {

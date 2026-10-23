@@ -3,6 +3,7 @@ Third-party notices
 ----- BEGIN THIRD-PARTY LICENSE: upstream:alex-pinkus_tree-sitter-swift -----
 Source: https://github.com/alex-pinkus/tree-sitter-swift
 Revision: license blob f158d7005311344ac316830fe68492214e1645e6
+Additional source revisions: 0c5444e4f179f34efda0ed2b35958cfabdacfe3d, 2907592fcab0147917615eb285e416886b71cb35 and 9e3b87f66f1fd2f3b931376fd3723ab788e337c3 (bounded directive scanning and switch statement parsing; local portable allocation and CRLF handling retained).
 
 Original file: LICENSE
 

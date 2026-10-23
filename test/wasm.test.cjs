@@ -79,6 +79,18 @@ test("builds a portable Wasm parser without process or stdio imports", async () 
     query.delete();
   }
   declaration.delete();
+  for (const text of [
+    "switch value {\ncase 0:\n  run()\n  @MainActor func task() {}\n  weak var item: Object?\ndefault: break\n}\n",
+    "switch value {\ncase 0:\n  run()\n  open()\ndefault: break\n}\n",
+  ]) {
+    const switched = parser.parse(text);
+    assert.equal(
+      switched.rootNode.hasError,
+      false,
+      switched.rootNode.toString()
+    );
+    switched.delete();
+  }
   for (const ending of ["\n", "\r\n"]) {
     const text = [
       "let pattern = #/",
@@ -101,7 +113,7 @@ test("builds a portable Wasm parser without process or stdio imports", async () 
   parser.delete();
 });
 
-test("fails fast when scanner allocation fails in native and Wasm builds", () => {
+test("bounds directive scanning at EOF and fails fast on allocation failure", () => {
   const source = path.join(root, "test", "scanner-allocation.c");
   const cc = process.env.CC || (process.platform === "win32" ? "gcc" : "cc");
   const hasCompiler = !cp.spawnSync(cc, ["--version"], { windowsHide: true })
