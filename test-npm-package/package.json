@@ -11,5 +11,13 @@
   "dependencies": {
     "tree-sitter": "^0.25.1",
     "@lumine-code/tree-sitter-swift": "file:../"
+  },
+  "overrides": {
+    "eslint@^10.14.0": {
+      "minimatch": "11.0.8"
+    },
+    "@eslint/config-array@0.23.5": {
+      "minimatch": "11.0.8"
+    }
   }
 }

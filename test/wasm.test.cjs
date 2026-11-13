@@ -177,3 +177,93 @@ test("bounds directive scanning at EOF and fails fast on allocation failure", ()
     );
   }
 });
+
+test("parses empty tuple expressions through incremental edits and undo", async (t) => {
+  const cases = [
+    ["result success", "func unit() { completion(.success(())) }\n", 1, 1],
+    [
+      "named argument",
+      'func unit() { log(tag: "reset", payload: ()) }\n',
+      1,
+      1,
+    ],
+    ["nested pair", "let pair = (1, ())\n", 2, 1],
+    ["assignment", "let empty = ()\n", 1, 1],
+    [
+      "continuation",
+      "func unit() { continuation.resume(returning: ()) }\n",
+      1,
+      1,
+    ],
+    ["return", "func unit() { return () }\n", 1, 1],
+    ["nonempty tuple control", "let pair = (1, 2)\n", 1, 0],
+    ["empty call control", "func unit() { run() }\n", 0, 0],
+  ];
+  const point = (text) => {
+    const rows = text.split("\n");
+    return { row: rows.length - 1, column: rows.at(-1).length };
+  };
+  function check(tree, source, tupleCount, emptyCount) {
+    const node = tree.rootNode;
+    assert.equal(node.hasError, false, node.toString());
+    assert.equal(node.text, source);
+    const tuples = node.descendantsOfType("tuple_expression");
+    assert.equal(tuples.length, tupleCount);
+    assert.equal(
+      tuples.filter(
+        (tuple) =>
+          tuple.namedChildCount === 0 &&
+          tuple.childForFieldName("value") === null
+      ).length,
+      emptyCount
+    );
+  }
+  await Parser.init();
+  const language = await Language.load(fs.readFileSync(wasm));
+  const parser = new Parser();
+  parser.setLanguage(language);
+  try {
+    for (const [name, source, tupleCount, emptyCount] of cases) {
+      await t.test(name, () => {
+        let tree = parser.parse(source);
+        try {
+          check(tree, source, tupleCount, emptyCount);
+          const original = tree.rootNode.toString();
+          const suffix = "let upstreamTail = 99\n";
+          const appended = source + suffix;
+          const start = point(source);
+          const end = point(appended);
+          tree.edit({
+            startIndex: source.length,
+            oldEndIndex: source.length,
+            newEndIndex: appended.length,
+            startPosition: start,
+            oldEndPosition: start,
+            newEndPosition: end,
+          });
+          let next = parser.parse(appended, tree);
+          tree.delete();
+          tree = next;
+          check(tree, appended, tupleCount, emptyCount);
+          tree.edit({
+            startIndex: source.length,
+            oldEndIndex: appended.length,
+            newEndIndex: source.length,
+            startPosition: start,
+            oldEndPosition: end,
+            newEndPosition: start,
+          });
+          next = parser.parse(source, tree);
+          tree.delete();
+          tree = next;
+          check(tree, source, tupleCount, emptyCount);
+          assert.equal(tree.rootNode.toString(), original);
+        } finally {
+          tree.delete();
+        }
+      });
+    }
+  } finally {
+    parser.delete();
+  }
+});
