@@ -1,0 +1,69 @@
+{
+  "upstream": {
+    "repository": "alex-pinkus/tree-sitter-swift",
+    "revision": "a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
+    "file": "test/corpus/precedence.txt"
+  },
+  "cases": [
+    {
+      "name": "An operator's operand stops at a looser operator",
+      "source": "a == b || c\na < b || c\na != nil || c\na ?? b || c\na || b == c\n",
+      "expectedTree": "(source_file (disjunction_expression (equality_expression (simple_identifier) (simple_identifier)) (simple_identifier)) (disjunction_expression (comparison_expression (simple_identifier) (simple_identifier)) (simple_identifier)) (disjunction_expression (infix_expression (simple_identifier) (custom_operator) (nil_literal)) (simple_identifier)) (disjunction_expression (nil_coalescing_expression (simple_identifier) (simple_identifier)) (simple_identifier)) (disjunction_expression (simple_identifier) (equality_expression (simple_identifier) (simple_identifier))))"
+    },
+    {
+      "name": "A call binds tighter than any binary operator",
+      "source": "a && b()\na + b(1)\na || b() && c\nx * f(1) / g(2)\n",
+      "expectedTree": "(source_file (conjunction_expression (simple_identifier) (call_expression (simple_identifier) (call_suffix (value_arguments)))) (additive_expression (simple_identifier) (call_expression (simple_identifier) (call_suffix (value_arguments (value_argument (integer_literal)))))) (disjunction_expression (simple_identifier) (conjunction_expression (call_expression (simple_identifier) (call_suffix (value_arguments))) (simple_identifier))) (multiplicative_expression (multiplicative_expression (simple_identifier) (call_expression (simple_identifier) (call_suffix (value_arguments (value_argument (integer_literal)))))) (call_expression (simple_identifier) (call_suffix (value_arguments (value_argument (integer_literal)))))))"
+    },
+    {
+      "name": "A trailing closure does not take the body of an if",
+      "source": "if a == f(x) { }\nif a == b { }\n",
+      "expectedTree": "(source_file (if_statement (equality_expression (simple_identifier) (call_expression (simple_identifier) (call_suffix (value_arguments (value_argument (simple_identifier))))))) (if_statement (equality_expression (simple_identifier) (simple_identifier))))"
+    },
+    {
+      "name": "Prefix operators apply to the whole postfix chain, implicit members are called",
+      "source": "!f()\n-x + y\n!a.b()\nx = .a.b()\nx = -.x\n",
+      "expectedTree": "(source_file (prefix_expression (bang) (call_expression (simple_identifier) (call_suffix (value_arguments)))) (additive_expression (prefix_expression (simple_identifier)) (simple_identifier)) (prefix_expression (bang) (call_expression (navigation_expression (simple_identifier) (navigation_suffix (simple_identifier))) (call_suffix (value_arguments)))) (assignment (directly_assignable_expression (simple_identifier)) (call_expression (prefix_expression (navigation_expression (simple_identifier) (navigation_suffix (simple_identifier)))) (call_suffix (value_arguments)))) (assignment (directly_assignable_expression (simple_identifier)) (prefix_expression (prefix_expression (simple_identifier)))))"
+    },
+    {
+      "name": "Postfix operators, optional chaining and casts bind tighter than binary operators",
+      "source": "a ?? b!\na.b == c?.d\na ?? b as Any\nx as? T ?? d\n",
+      "expectedTree": "(source_file (nil_coalescing_expression (simple_identifier) (postfix_expression (simple_identifier) (bang))) (equality_expression (navigation_expression (simple_identifier) (navigation_suffix (simple_identifier))) (navigation_expression (simple_identifier) (navigation_suffix (simple_identifier)))) (nil_coalescing_expression (simple_identifier) (as_expression (simple_identifier) (as_operator) (user_type (type_identifier)))) (nil_coalescing_expression (as_expression (simple_identifier) (as_operator) (user_type (type_identifier))) (simple_identifier)))"
+    },
+    {
+      "name": "Bitwise operators follow Swift's precedence groups",
+      "source": "a & b == c\nx << 4 + y\na | b | c\n",
+      "expectedTree": "(source_file (equality_expression (bitwise_operation (simple_identifier) (simple_identifier)) (simple_identifier)) (additive_expression (bitwise_operation (simple_identifier) (integer_literal)) (simple_identifier)) (bitwise_operation (bitwise_operation (simple_identifier) (simple_identifier)) (simple_identifier)))"
+    },
+    {
+      "name": "Generic arguments win over comparisons",
+      "source": "let n = MemoryLayout<T>.size\n",
+      "expectedTree": "(source_file (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (navigation_expression (user_type (type_identifier) (type_arguments (user_type (type_identifier)))) (navigation_suffix (simple_identifier)))))"
+    },
+    {
+      "name": "try with implicit members and prefixed calls",
+      "source": "let r = try .success(x)\nif try !f(x) { }\n",
+      "expectedTree": "(source_file (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (try_expression (try_operator) (call_expression (prefix_expression (simple_identifier)) (call_suffix (value_arguments (value_argument (simple_identifier))))))) (if_statement (try_expression (try_operator) (prefix_expression (bang) (call_expression (simple_identifier) (call_suffix (value_arguments (value_argument (simple_identifier)))))))))"
+    },
+    {
+      "name": "Prefix operators bind tighter than every binary operator",
+      "source": "~a & b\n-a << 2\n-a * b\n-f(x) * 2\n-1 as Any?\n",
+      "expectedTree": "(source_file (bitwise_operation (prefix_expression (simple_identifier)) (simple_identifier)) (bitwise_operation (prefix_expression (simple_identifier)) (integer_literal)) (multiplicative_expression (prefix_expression (simple_identifier)) (simple_identifier)) (multiplicative_expression (prefix_expression (call_expression (simple_identifier) (call_suffix (value_arguments (value_argument (simple_identifier)))))) (integer_literal)) (as_expression (prefix_expression (integer_literal)) (as_operator) (optional_type (user_type (type_identifier)))))"
+    },
+    {
+      "name": "Ranges, casts and type checks against neighbouring operators",
+      "source": "r == 0..<5\nx < a..<b\nlet n = 0..<n + 1\na ?? b is T\nlet r = 0...(n / 2)\nlet m = .min ... .max\n",
+      "expectedTree": "(source_file (equality_expression (simple_identifier) (range_expression (integer_literal) (integer_literal))) (comparison_expression (simple_identifier) (range_expression (simple_identifier) (simple_identifier))) (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (range_expression (integer_literal) (additive_expression (simple_identifier) (integer_literal)))) (nil_coalescing_expression (simple_identifier) (check_expression (simple_identifier) (user_type (type_identifier)))) (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (range_expression (integer_literal) (tuple_expression (multiplicative_expression (simple_identifier) (integer_literal))))) (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (range_expression (prefix_expression (simple_identifier)) (prefix_expression (simple_identifier)))))"
+    },
+    {
+      "name": "Operators the scanner reads as custom operators rank as comparisons",
+      "source": "x >= a ?? 0\nx != a as T\na != b || c\n",
+      "expectedTree": "(source_file (infix_expression (simple_identifier) (custom_operator) (nil_coalescing_expression (simple_identifier) (integer_literal))) (infix_expression (simple_identifier) (custom_operator) (as_expression (simple_identifier) (as_operator) (user_type (type_identifier)))) (disjunction_expression (infix_expression (simple_identifier) (custom_operator) (simple_identifier)) (simple_identifier)))"
+    },
+    {
+      "name": "try covers the whole expression after it",
+      "source": "let a = try a == b && c\nlet b = try !a && b\nlet c = await -a + b\n",
+      "expectedTree": "(source_file (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (try_expression (try_operator) (conjunction_expression (equality_expression (simple_identifier) (simple_identifier)) (simple_identifier)))) (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (try_expression (try_operator) (conjunction_expression (prefix_expression (bang) (simple_identifier)) (simple_identifier)))) (property_declaration (value_binding_pattern) (pattern (simple_identifier)) (await_expression (additive_expression (prefix_expression (simple_identifier)) (simple_identifier)))))"
+    }
+  ]
+}

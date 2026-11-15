@@ -6,6 +6,8 @@ Revision: license blob f158d7005311344ac316830fe68492214e1645e6
 Additional source revisions: 0c5444e4f179f34efda0ed2b35958cfabdacfe3d, 2907592fcab0147917615eb285e416886b71cb35 and 9e3b87f66f1fd2f3b931376fd3723ab788e337c3 (bounded directive scanning and switch statement parsing; local portable allocation and CRLF handling retained).
 Additional source revisions: fa5c5b503a9a4bba67726510c845c4d846571216 and 5ecda5d8911d259721c2749aed72e7d2b6ef26dd (grammar DSL simplification and empty tuple expressions; local portable scanner and earlier safety fixes retained).
 
+Additional source revision: a1d4a7b80260bf960f9e25198cddecbe5e6c46aa (Swift binary, call, cast and prefix precedence; original corpus expectations retained, alongside local portable scanner, CRLF and empty tuple fixes).
+
 Original file: LICENSE
 
 MIT License

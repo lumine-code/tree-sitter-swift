@@ -267,3 +267,71 @@ test("parses empty tuple expressions through incremental edits and undo", async 
     parser.delete();
   }
 });
+
+test("preserves Swift precedence through incremental identifier edits and undo", async (t) => {
+  const { cases } = require("./precedence-cases.json");
+  const shape = (node) =>
+    `(${node.type}${node.namedChildren.map((child) => " " + shape(child)).join("")})`;
+  const point = (text) => {
+    const rows = text.split("\n");
+    return { row: rows.length - 1, column: rows.at(-1).length };
+  };
+  await Parser.init();
+  const language = await Language.load(fs.readFileSync(wasm));
+  const parser = new Parser();
+  parser.setLanguage(language);
+  try {
+    for (const { name, source, expectedTree } of cases) {
+      await t.test(name, () => {
+        let tree = parser.parse(source);
+        const check = (text) => {
+          assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
+          assert.equal(tree.rootNode.text, text);
+          assert.equal(shape(tree.rootNode), expectedTree);
+        };
+        try {
+          check(source);
+          const identifier =
+            tree.rootNode.descendantsOfType("simple_identifier")[0];
+          assert.ok(identifier);
+          const startIndex = identifier.startIndex;
+          const oldEndIndex = identifier.endIndex;
+          const prefix = source.slice(0, startIndex);
+          const replacement = "precedenceValue";
+          const edited = prefix + replacement + source.slice(oldEndIndex);
+          const startPosition = point(prefix);
+          const oldEndPosition = point(source.slice(0, oldEndIndex));
+          const newEndPosition = point(prefix + replacement);
+          tree.edit({
+            startIndex,
+            oldEndIndex,
+            newEndIndex: startIndex + replacement.length,
+            startPosition,
+            oldEndPosition,
+            newEndPosition,
+          });
+          let next = parser.parse(edited, tree);
+          tree.delete();
+          tree = next;
+          check(edited);
+          tree.edit({
+            startIndex,
+            oldEndIndex: startIndex + replacement.length,
+            newEndIndex: oldEndIndex,
+            startPosition,
+            oldEndPosition: newEndPosition,
+            newEndPosition: oldEndPosition,
+          });
+          next = parser.parse(source, tree);
+          tree.delete();
+          tree = next;
+          check(source);
+        } finally {
+          tree.delete();
+        }
+      });
+    }
+  } finally {
+    parser.delete();
+  }
+});

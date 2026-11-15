@@ -8,7 +8,7 @@
   "scripts": {
     "install": "tree-sitter generate && node-gyp-build",
     "test": "tree-sitter test && node --test test/wasm.test.cjs",
-    "lint": "eslint test/wasm.test.cjs scripts/generate-parser.js eslint.config.cjs && prettier --check package.json tree-sitter.json README.md eslint.config.cjs .prettierrc.json .github/workflows/ci.yml .github/workflows/publish.yml test/wasm.test.cjs scripts/generate-parser.js test-npm-package/package.json test-npm-package/index.js",
+    "lint": "eslint test/wasm.test.cjs scripts/generate-parser.js eslint.config.cjs && prettier --check package.json tree-sitter.json README.md eslint.config.cjs .prettierrc.json .github/workflows/ci.yml .github/workflows/publish.yml test/wasm.test.cjs test/precedence-cases.json scripts/generate-parser.js test-npm-package/package.json test-npm-package/index.js",
     "build": "tree-sitter generate",
     "prepare": "tree-sitter generate"
   },
@@ -43,6 +43,7 @@
     "src/**",
     "*.wasm",
     "test/wasm.test.cjs",
+    "test/precedence-cases.json",
     "test/scanner-allocation.c",
     "THIRD_PARTY_NOTICES"
   ],
@@ -65,7 +66,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "globals": "^17.14.0",
     "node-gyp": "13.1.0",
     "prettier": "^3.10.1",
@@ -78,7 +79,7 @@
     "access": "public"
   },
   "overrides": {
-    "eslint@^10.14.0": {
+    "eslint@^10.15.0": {
       "minimatch": "11.0.8"
     },
     "@eslint/config-array@0.23.5": {
