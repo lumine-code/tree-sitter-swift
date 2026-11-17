@@ -590,6 +590,38 @@ do {
         (integer_literal)))))
 
 ================================================================================
+Do-catch with several patterns
+================================================================================
+
+do {
+} catch FirstError.failed, SecondError.failed where retry {
+} catch where retry {
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (do_statement
+    (catch_block
+      (catch_keyword)
+      (pattern
+        (user_type
+          (type_identifier))
+        (simple_identifier))
+      (pattern
+        (user_type
+          (type_identifier))
+        (simple_identifier))
+      (where_clause
+        (where_keyword)
+        (simple_identifier)))
+    (catch_block
+      (catch_keyword)
+      (where_clause
+        (where_keyword)
+        (simple_identifier)))))
+
+================================================================================
 Discard self
 ================================================================================
 

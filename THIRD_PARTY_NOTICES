@@ -7,6 +7,7 @@ Additional source revisions: 0c5444e4f179f34efda0ed2b35958cfabdacfe3d, 2907592fc
 Additional source revisions: fa5c5b503a9a4bba67726510c845c4d846571216 and 5ecda5d8911d259721c2749aed72e7d2b6ef26dd (grammar DSL simplification and empty tuple expressions; local portable scanner and earlier safety fixes retained).
 
 Additional source revision: a1d4a7b80260bf960f9e25198cddecbe5e6c46aa (Swift binary, call, cast and prefix precedence; original corpus expectations retained, alongside local portable scanner, CRLF and empty tuple fixes).
+Additional source revision: fef1236022ccde2d2bc5c32d4db8947c87a7f848 (multiple patterns and individual guards in a single catch clause).
 
 Original file: LICENSE
 
